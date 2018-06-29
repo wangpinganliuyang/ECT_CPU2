@@ -4,6 +4,7 @@
  *  Created on: 2018年6月25日
  *      Author: wangpingan
  *      初始化和数控系统交互的参数
+ *      测试数据
  */
 #include "GDC16.h"
 #include "GDC_PV1_0.h"
