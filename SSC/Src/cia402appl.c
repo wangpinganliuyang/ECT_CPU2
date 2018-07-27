@@ -83,13 +83,30 @@ const UCHAR OBJMEM aName0x1C13[] = "T";
 * @{
 */
 /**
+ * \brief Object 0x1600 (csp/csv RxPDO) entry descriptions
+ */
+OBJCONST TSDOINFOENTRYDESC  OBJMEM asEntryDesc0x1600[] = {
+   {DEFTYPE_UNSIGNED8, 0x8, ACCESS_READ }, /* Subindex*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6040*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x607A*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x60FF*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6060*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}}; /*0x60B8*/
+
+/**
+ * \brief Object 0x1600 (csp/csv RxPDO) object and entry names
+ *
+ * In this example no specific entry name is defined ("SubIndex xxx" is used)
+ */
+OBJCONST UCHAR OBJMEM aName0x1600[] = "c\000\377";
+
+/**
  * \brief Object 0x1601 (csp RxPDO) entry descriptions
  */
 OBJCONST TSDOINFOENTRYDESC  OBJMEM asEntryDesc0x1601[] = {
    {DEFTYPE_UNSIGNED8, 0x8, ACCESS_READ }, /* Subindex 000 */
    {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* SubIndex 001*/
    {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}}; /* SubIndex 002*/
-
 
 /**
  * \brief Object 0x1601 (csp RxPDO) object and entry names
@@ -133,6 +150,21 @@ OBJCONST TSDOINFOENTRYDESC  OBJMEM asEntryDesc0x1603[] = {
  */
 OBJCONST UCHAR OBJMEM aName0x1603[] = "c\000\377";
 
+
+/**
+ * \brief Object 0x1A00 (csp/csv RxPDO) entry descriptions
+ */
+OBJCONST TSDOINFOENTRYDESC  OBJMEM asEntryDesc0x1A00[] = {
+   {DEFTYPE_UNSIGNED8, 0x8, ACCESS_READ }, /* Subindex 000 */
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6041*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6064*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x606C*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6077*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x6061*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* 0x60B9*/
+   {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}}; /* 0x60BA */
+
+
 /**
  * \brief Object 0x1A01 (csp RxPDO) entry descriptions
  */
@@ -140,6 +172,13 @@ OBJCONST TSDOINFOENTRYDESC  OBJMEM asEntryDesc0x1A01[] = {
    {DEFTYPE_UNSIGNED8, 0x8, ACCESS_READ }, /* Subindex 000 */
    {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}, /* SubIndex 001*/
    {DEFTYPE_UNSIGNED32, 0x20, ACCESS_READ}}; /* SubIndex 002 */
+
+/**
+ * \brief Object 0x1A00 (csp/csv TxPDO) object and entry names
+ *
+ * In this example no specific entry name is defined ("SubIndex xxx" is used)
+ */
+OBJCONST UCHAR OBJMEM aName0x1A00[] = "c\000\377";
 
 
 /**
@@ -491,23 +530,25 @@ OBJCONST TSDOINFOENTRYDESC    OBJMEM sEntryDesc0x6502 = {DEFTYPE_UNSIGNED32, 0x2
 /** \brief Object 0x6502 (Supported Drive Modes) object name*/
 OBJCONST UCHAR OBJMEM aName0x6502[] = "S";
 
-TOBJ1C12 sRxPDOassign = {1,0x1601};
+TOBJ1C12 sRxPDOassign = {1,0x1600};
 
-TOBJ1C13 sTxPDOassign = {1,0x1A01};
+TOBJ1C13 sTxPDOassign = {1,0x1A00};
 
 CiA402Objects DefCiA402ObjectValues
 = {
+{5, {0x60400010,0x607A0020,0x60FF0020,0x60600010,0x60B80010}}, /*TOBJ1600*/
 {2, {0x60400010,0x607A0020}}, /*TOBJ1601*/
 {2, {0x60400010,0x60FF0020}}, /*TOBJ1602*/
 {2, {0x60400010,0x60710010}}, /*TOBJ1603*/
+{7, {0x60410010,0x60640020,0x606C0020,0x60770020,0x60610010,0x60B90010,0x60BA0020}}, /*TOBJ1A00*/
 {2, {0x60410010,0x60640020}}, /*TOBJ1A01*/
 {3, {0x60410010,0x60640020,0x606C0020}},/*TOBJ1A02*/
 {3, {0x60410010,0x60640020,0x60770010}},/*TOBJ1A03*/
 0x0,/*(UINT16) ErrorCode 0x603F*/
 0x0,/*(UINT16) ControlWord 0x6040*/
 0x0,/*(UINT16) StatusWord 0x6041*/
-0x0,/*(INT16) ModeOfOperation 0x6060*/
-0x0,/*(INT16) Mode Of Operation Display 0x6061*/
+0x9,/*(INT16) ModeOfOperation 0x6060*/
+0x9,/*(INT16) Mode Of Operation Display 0x6061*/
 0x0,/*(UINT32) Position actual internal value 0x6063*/
 0x0,/*(INT32) Position Actual Value 0x6064*/
 0x0,/*(UINT32) Following error window 0x6065*/
@@ -560,12 +601,16 @@ TOBJECT    OBJMEM ApplicationObjDic[3]
 
 TOBJECT    OBJMEM DefCiA402AxisObjDic[]
 = {
+   /* Object 0x1600 */
+  {NULL,NULL, 0x1600, {DEFTYPE_PDOMAPPING, 5 | (OBJCODE_REC << 8)}, asEntryDesc0x1600, aName0x1600,NULL, NULL, NULL, 0x0000 },
     /* Object 0x1601 */
    {NULL,NULL, 0x1601, {DEFTYPE_PDOMAPPING, 2 | (OBJCODE_REC << 8)}, asEntryDesc0x1601, aName0x1601,NULL, NULL, NULL, 0x0000 },
     /* Object 0x1602 */
    {NULL,NULL, 0x1602, {DEFTYPE_PDOMAPPING, 2 | (OBJCODE_REC << 8)}, asEntryDesc0x1602, aName0x1602, NULL, NULL, NULL, 0x0000 },
    /* Object 0x1603 */
    {NULL,NULL, 0x1603, {DEFTYPE_PDOMAPPING, 2 | (OBJCODE_REC << 8)}, asEntryDesc0x1603, aName0x1603, NULL, NULL, NULL, 0x0000 },
+   /* Object 0x1A00 */
+   {NULL,NULL, 0x1A00, {DEFTYPE_PDOMAPPING, 7 | (OBJCODE_REC << 8)}, asEntryDesc0x1A00, aName0x1A00, NULL, NULL, NULL, 0x0000 },
    /* Object 0x1A01 */
    {NULL,NULL, 0x1A01, {DEFTYPE_PDOMAPPING, 2 | (OBJCODE_REC << 8)}, asEntryDesc0x1A01, aName0x1A01, NULL, NULL, NULL, 0x0000 },
    /* Object 0x1A02 */
@@ -691,7 +736,6 @@ UINT16 CiA402_Init(void)
 
     LocalAxes.fCurPosition = 0;
     LocalAxes.u32CycleTime = 2000;
-    LocalAxes.bAxisIsActive = 0;
     /***********************************
         init objects
     *************************************/
@@ -715,6 +759,8 @@ UINT16 CiA402_Init(void)
 
         switch(pDiCEntry->Index)
         {
+        case 0x1600:
+            pDiCEntry->pVarPtr = &LocalAxes.Objects.sRxPDOMap0;
         case 0x1601:
             pDiCEntry->pVarPtr = &LocalAxes.Objects.sRxPDOMap1;
             break;
@@ -723,6 +769,9 @@ UINT16 CiA402_Init(void)
             break;
         case 0x1603:
             pDiCEntry->pVarPtr = &LocalAxes.Objects.sRxPDOMap3;
+            break;
+        case 0x1A00:
+            pDiCEntry->pVarPtr = &LocalAxes.Objects.sTxPDOMap0;
             break;
         case 0x1A01:
             pDiCEntry->pVarPtr = &LocalAxes.Objects.sTxPDOMap1;
@@ -1249,7 +1298,6 @@ void CiA402_Application(TCiA402Axis *pCiA402Axis)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_Application(void)
 {
-
         if(LocalAxes.bAxisIsActive)
             CiA402_Application(&LocalAxes);
 
@@ -1410,6 +1458,10 @@ UINT16 APPL_GenerateMapping(UINT16 *pInputSize,UINT16 *pOutputSize)
 
      switch ((sRxPDOassign.aEntries[0] & 0x000F))    //mask Axis type (supported modes)
      {
+         case 0:
+              /*drive mode supported    csp/csv (cyclic sync position) : */
+              OutputSize = 104;
+              break;
          case 1:
              /*drive mode supported    csp (cyclic sync position) : bit 7*/
              LocalAxes.Objects.objSupportedDriveModes = 0x80;
@@ -1448,24 +1500,27 @@ UINT16 APPL_GenerateMapping(UINT16 *pInputSize,UINT16 *pOutputSize)
         /*Scan Object 0x1C13 TXPDO assign*/
         switch ((sTxPDOassign.aEntries[0] & 0x000F))    //mask Axis type (supported modes)
         {
-        case 1: /*csp*/
-            for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap1.u16SubIndex0;u16cnt++)
-            {
-                InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap1.aEntries[u16cnt] & 0xFF);
-            }
-            break;
-        case 2: /*csv*/
-            for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap2.u16SubIndex0;u16cnt++)
-            {
-                InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap2.aEntries[u16cnt] & 0xFF);
-            }
-            break;
-        case 3: /*cst*/
-            for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap3.u16SubIndex0;u16cnt++)
-            {
-                InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap3.aEntries[u16cnt] & 0xFF);
-            }
-            break;
+            case 0: /*csp/csv*/
+                InputSize = 152;
+                break;
+            case 1: /*csp*/
+                for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap1.u16SubIndex0;u16cnt++)
+                {
+                    InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap1.aEntries[u16cnt] & 0xFF);
+                }
+                break;
+            case 2: /*csv*/
+                for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap2.u16SubIndex0;u16cnt++)
+                {
+                    InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap2.aEntries[u16cnt] & 0xFF);
+                }
+                break;
+            case 3: /*cst*/
+                for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap3.u16SubIndex0;u16cnt++)
+                {
+                    InputSize +=(UINT16)(LocalAxes.Objects.sTxPDOMap3.aEntries[u16cnt] & 0xFF);
+                }
+                break;
         default:
             for(u16cnt =0 ; u16cnt < LocalAxes.Objects.sTxPDOMap1.u16SubIndex0;u16cnt++)
             {

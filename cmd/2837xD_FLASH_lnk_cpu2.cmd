@@ -54,7 +54,7 @@ SECTIONS
    /* Allocate program areas: */
    .cinit              : > FLASHL      PAGE = 0, ALIGN(4)
    .pinit              : > FLASHL,     PAGE = 0, ALIGN(4)
-   .text               : >> FLASHL | FLASHM       PAGE = 0, ALIGN(4)
+   .text               : >> FLASHK |FLASHL | FLASHM       PAGE = 0, ALIGN(4)
    codestart           : > BEGIN       PAGE = 0, ALIGN(4)
 
    /* Allocate uninitalized data sections: */

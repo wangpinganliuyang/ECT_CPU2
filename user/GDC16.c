@@ -20,6 +20,12 @@ GDC_WR CPU2_CPU1;
 #pragma DATA_SECTION(CPU1_CPU2,"SHARERAMGS14");
 #pragma DATA_SECTION(CPU2_CPU1,"SHARERAMGS15");
 uint16_t count;
+uint16_t CountFault;
+uint16_t CountRest;
+uint16_t Data_input1;
+uint16_t Data_input2;
+uint16_t Data_input3;
+uint16_t Data_input4;
 /////////////////////////////////////////////////////////////////////////////////////////
 /** 主函数
 *////////////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +34,18 @@ void main(void)
 //	GDC_WR* v = &CPU2_CPU1;
     UINT16 u16PdiCtrl = 0;
     count = 0;
+    CountFault = 0;
+    CountRest = 0;
+    Count1C12 = 0;
+    Count1C13 = 0;
+    Count6060 = 0;
+    Count6061 = 0;
+    CountGdub = 0;
+    Data_input1 = 0;
+    Data_input2 = 0;
+    Data_input3 = 0;
+    Data_input4 = 0;
+
 	f2837xd_Init();//初始化F28377D
     do
     {
@@ -57,6 +75,7 @@ void InitRAM(void)
     v->CycleTime = 2000;
     v->SyncType = 2;
     v->DC2DCValue = 2000;
+    v->ControlWord.all = 0x0004;
 }
 //周期性通讯往CPU1写入数据
 #ifdef RAM_FLASH
@@ -65,14 +84,33 @@ void InitRAM(void)
 void Output_GDCmapping(UINT16* pData)
 {
 	GDC_WR* v = &CPU2_CPU1;
+	GDC_R* v1 = &CPU1_CPU2;
 //	data1 = v->Flags.bits.CycleOrder;
 	switch ((sRxPDOassign.aEntries[0] & 0x000F))
     {
+	    case 0:    //csp/csv RxPDO    entries
+            {
+                TCiA402PDO1600 *pOutputs = (TCiA402PDO1600 *)pData;
+                v->ControlWord.all = pOutputs->ObjControlWord;
+                v->ControlWord.all |= 0x0200;
+                v->TargetPosition = pOutputs->ObjTargetPosition;
+                v->TargetVelocity = pOutputs->ObjTargetVelocity;
+                v->ModesOfOperation = pData[5];
+                v->TouchProbeFunction.all = (((uint16_t)pData[5])>>8) + ((((uint16_t)pData[6]) &0x00FF)<<8);
+                //中间隔离
+                LocalAxes.Objects.objControlWord = (pOutputs->ObjControlWord);
+                LocalAxes.Objects.objTargetPosition = (pOutputs->ObjTargetPosition);
+                LocalAxes.Objects.objTargetVelocity    = (pOutputs->ObjTargetVelocity);
+                LocalAxes.Objects.objModesOfOperation = ((pOutputs->ObjModesOfOperation & 0x00FF));
+            }
+            break;
+
         case 1:    //csp RxPDO    entries
             {
             TCiA402PDO1601 *pOutputs = (TCiA402PDO1601 *)pData;
             v->ControlWord.all = pOutputs->ObjControlWord;
-            v->SetTarget = pOutputs->ObjTargetPosition;
+            v->ControlWord.all |= 0x0200;
+            v->TargetPosition = pOutputs->ObjTargetPosition;
             v->ModesOfOperation = 8;
             //中间隔离
             LocalAxes.Objects.objControlWord = pOutputs->ObjControlWord;
@@ -84,7 +122,9 @@ void Output_GDCmapping(UINT16* pData)
             {
             TCiA402PDO1602 *pOutputs = (TCiA402PDO1602 *)pData;
             v->ControlWord.all = pOutputs->ObjControlWord;
-            v->SetTarget    = pOutputs->ObjTargetVelocity;
+            v->ControlWord.all |= 0x0200;
+            v->TargetVelocity    = (pOutputs->ObjTargetVelocity) ;
+            v->TargetVelocity    = ((uint32_t)((v->TargetVelocity) * 5592 ));
             v->ModesOfOperation = 9;
             //中间隔离
             LocalAxes.Objects.objControlWord = pOutputs->ObjControlWord;
@@ -96,7 +136,8 @@ void Output_GDCmapping(UINT16* pData)
             {
             TCiA402PDO1603 *pOutputs = (TCiA402PDO1603 *)pData;
             v->ControlWord.all = pOutputs->ObjControlWord;
-            v->SetTarget    = pOutputs->ObjTargetTorque;
+            v->ControlWord.all |= 0x0200;
+            v->TargetTorque    = pOutputs->ObjTargetTorque;
             v->ModesOfOperation = 10;
             //中间隔离
             LocalAxes.Objects.objControlWord = pOutputs->ObjControlWord;
@@ -104,6 +145,7 @@ void Output_GDCmapping(UINT16* pData)
             }
             break;
       }
+    v->ControlWord.all |= 0x0004;
 	v->Flags.bits.CycleOrder = !(v->Flags.bits.CycleOrder);
 }
 #ifdef RAM_FLASH
@@ -117,6 +159,24 @@ void Input_GDCmapping(UINT16* pData)
 	{
 	    switch ((sTxPDOassign.aEntries[0]& 0x000F))
 	    {
+        case 0:    //copy csp/csv TxPDO entries
+            {
+                TCiA402PDO1A00 *pInputs = (TCiA402PDO1A00 *)pData;
+                pInputs->ObjStatusWord = v->StatusWord.all;
+                pInputs->ObjPositionActualValue = v->PositionActualValue;
+                pInputs->ObjVelocityActualValue = v->VelocityActualValue;
+                pInputs->ObjTorqueActualValue = ((uint16_t)v->TorqueActualValue);
+                pInputs->ObjModesOfOperationDisplay = ((uint16_t)v->ModesOfOperationDisplay);
+                pInputs->ObjTouchProbestatus = v->TouchProbestatus.all;
+                pInputs->ObjTouchProbesP = v->TouchProbesP;
+
+//                pInputs->ObjStatusWord = (LocalAxes.Objects.objStatusWord);
+//                pInputs->ObjPositionActualValue = (LocalAxes.Objects.objPositionActualValue);
+//                pInputs->ObjVelocityActualValue = (LocalAxes.Objects.objVelocityActualValue);
+//                pInputs->ObjTorqueActualValue = LocalAxes.Objects.objTorqueActualValue;
+//                pInputs->ObjModesOfOperationDisplay = ((LocalAxes.Objects.objModesOfOperationDisplay & 0x00FF));
+            }
+            break;
 	    case 1://copy csp TxPDO entries
 	        {
 	            TCiA402PDO1A01 *pInputs = (TCiA402PDO1A01 *)pData;

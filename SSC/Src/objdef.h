@@ -273,7 +273,11 @@ PROTO    CHAR OBJMEM         aSubindexDesc[13];
 //#endif
 ;
 
-
+PROTO UINT16 Count1C12;
+PROTO UINT16 Count1C13;
+PROTO UINT16 Count6060;
+PROTO UINT16 Count6061;
+PROTO UINT16 CountGdub;
 /*-----------------------------------------------------------------------------------------
 ------
 ------    Global functions

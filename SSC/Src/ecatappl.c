@@ -134,8 +134,8 @@ V4.00 APPL 6: The main function was split in MainInit and MainLoop
 ------
 -----------------------------------------------------------------------------------------*/
 
-UINT16   aPdOutputData[3];//修改：根据周期性通讯设定
-UINT16   aPdInputData[6];//修改：仅仅支持周期同步位置模式，反馈状态字和实际位置。//包含周期性同步速度模式
+UINT16   aPdOutputData[7];//修改：根据周期性通讯设定
+UINT16   aPdInputData[12];//修改：仅仅支持周期同步位置模式，反馈状态字和实际位置。//包含周期性同步速度模式
 
 /*variables are declared in ecatslv.c*/
 extern VARVOLATILE UINT16    u16dummy;
@@ -172,13 +172,47 @@ void PDO_InputMapping(void)
 //		ESC_writeWordNonISR(aPdInputData[nPdInputSizei], addr);
 //		addr += 2;
 //	}
-	ESC_writeWordNonISR(aPdInputData[0], addr);
-	addr +=2;
-	ESC_writeWordNonISR(aPdInputData[2], addr);
-	addr +=2;
-	ESC_writeWordNonISR(aPdInputData[3], addr);
+	if( sTxPDOassign.aEntries[0] == 0x1a00 )
+	{
+	    ESC_writeWordNonISR(aPdInputData[0], addr);
+	    addr +=2;
+        ESC_writeWordNonISR(aPdInputData[2], addr);
+	    addr +=2;
+	    ESC_writeWordNonISR(aPdInputData[3], addr);
+	    addr +=2;
+        ESC_writeWordNonISR(aPdInputData[4], addr);
+        addr +=2;
+        ESC_writeWordNonISR(aPdInputData[5], addr);
+        addr +=2;
+        ESC_writeWordNonISR(aPdInputData[6], addr);
+        addr +=2;
+        Data_input1 = (((UINT16)aPdInputData[7]) & 0x00FF) + ((UINT16)((aPdInputData[8] & 0x00FF)<<8));
+        ESC_writeWordNonISR(Data_input1, addr);
+        addr +=2;
+        Data_input2 = (aPdInputData[8]>>8) +  (aPdInputData[10]<<8);
+        ESC_writeWordNonISR(Data_input2, addr);
+        addr +=2;
+        Data_input3 = (aPdInputData[10]>>8) + (aPdInputData[11]<<8);
+        ESC_writeWordNonISR(Data_input3, addr);
+        addr +=2;
+        Data_input4 = aPdInputData[11]>>8;
+        ESC_writeWordNonISR(Data_input4, addr);
+	}
+	if(sTxPDOassign.aEntries[0] == 0x1a01 )
+	{
+	    ESC_writeWordNonISR(aPdInputData[0], addr);
+	    addr +=2;
+	    ESC_writeWordNonISR(aPdInputData[2], addr);
+	    addr +=2;
+	    ESC_writeWordNonISR(aPdInputData[3], addr);
+	}
 	if(sTxPDOassign.aEntries[0] == 0x1a02)
 	{
+	    ESC_writeWordNonISR(aPdInputData[0], addr);
+	    addr +=2;
+	    ESC_writeWordNonISR(aPdInputData[2], addr);
+	    addr +=2;
+	    ESC_writeWordNonISR(aPdInputData[3], addr);
 	    addr +=2;
 	    ESC_writeWordNonISR(aPdInputData[4], addr);
 	    addr +=2;

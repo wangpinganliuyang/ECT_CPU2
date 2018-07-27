@@ -43,6 +43,10 @@
 
 
 extern uint16_t count;//对同步中断进行计数
+extern uint16_t Data_input1;//测试写
+extern uint16_t Data_input2;//测试写
+extern uint16_t Data_input3;//测试写
+extern uint16_t Data_input4;
 
 extern void Output_GDCmapping(UINT16* pData);
 extern void Input_GDCmapping(UINT16* pData);

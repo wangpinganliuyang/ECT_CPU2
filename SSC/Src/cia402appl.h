@@ -329,14 +329,23 @@ V5.01 : Start file change log
 
 /**
  * \addtogroup PdoMappingObjects PDO Mapping Objects
+ * csp/csv mode RxPDO mapping : 0x1600<br>
  * csp     mode RxPDO mapping : 0x1601<br>
  * csv     mode RxPDO mapping : 0x1602<br>
  * cst     mode RxPDO mapping : 0x1603<br>
+ * csp/csv mode RxPDO mapping : 0x1A00<br>
  * csp     mode RxPDO mapping : 0x1A01<br>
  * csv     mode RxPDO mapping : 0x1A02<br>
  * cst     mode RxPDO mapping : 0x1A03<br>
  * @{
  */
+/** \brief 0x1600 (csp RxPDO) data structure*/
+typedef struct OBJ_STRUCT_PACKED_START {
+   UINT16   u16SubIndex0; /**< \brief SubIndex 0*/
+   UINT32   aEntries[5]; /**< \brief Entry buffer*/
+} OBJ_STRUCT_PACKED_END
+TOBJ1600;
+
 /** \brief 0x1601 (csp RxPDO) data structure*/
 typedef struct OBJ_STRUCT_PACKED_START {
    UINT16   u16SubIndex0; /**< \brief SubIndex 0*/
@@ -359,6 +368,14 @@ typedef struct OBJ_STRUCT_PACKED_START {
    UINT32   aEntries[2]; /**< \brief Entry buffer*/
 } OBJ_STRUCT_PACKED_END
 TOBJ1603;
+
+/** \brief 0x1A00 (csp/csv TxPDO) data structure*/
+typedef struct OBJ_STRUCT_PACKED_START {
+   UINT16   u16SubIndex0; /**< \brief SubIndex 0*/
+   UINT32   aEntries[7]; /**< \brief Entry buffer*/
+} OBJ_STRUCT_PACKED_END
+TOBJ1A00;
+
 
 /** \brief 0x1A01 (csp TxPDO) data structure*/
 typedef struct OBJ_STRUCT_PACKED_START {
@@ -454,6 +471,20 @@ TOBJ60FE;
  * \addtogroup PDO Process Data Objects
  * @{
  */
+/** \brief Data structure to handle the process data transmitted via 0x1A00 (csp TxPDO)*/
+typedef struct STRUCT_PACKED_START
+{
+    UINT16 ObjStatusWord; /**< \brief Status word (0x6041)*/
+    INT32 ObjPositionActualValue; /**< \brief Actual position (0x6064)*/
+    INT32 ObjVelocityActualValue; /**< \(0x606C)*/
+    INT16 ObjTorqueActualValue; /**< \(0x6077)*/
+    UINT8 ObjModesOfOperationDisplay;   //0x6061;
+    UINT16 ObjTouchProbestatus;  //0x60B9;
+    UINT32 ObjTouchProbesP;     //0X60BA;
+}STRUCT_PACKED_END
+TCiA402PDO1A00;
+
+
 
 /** \brief Data structure to handle the process data transmitted via 0x1A01 (csp TxPDO)*/
 typedef struct STRUCT_PACKED_START
@@ -482,6 +513,17 @@ typedef struct STRUCT_PACKED_START
     INT32 ObjTorqueActualValue; /**< \brief Actual position (0x6077)*/
 }STRUCT_PACKED_END
 TCiA402PDO1A03;
+
+/** \brief Data structure to handle the process data transmitted via 0x1600 (csp/csv RxPDO)*/
+typedef struct STRUCT_PACKED_START
+{
+    UINT16 ObjControlWord; /**< \brief Control word (0x6040)*/
+    INT32 ObjTargetPosition; /**< \brief Target position (0x607A)*/
+    INT32 ObjTargetVelocity; /**< \brief Target velocity (0x60FF)*/
+    UINT8 ObjModesOfOperation;/**< \brief Modes of Operation (0x6060)*/
+    UINT16 ObjTouchProbeFunction;         /*Touch probe function 0x60B8*/
+}STRUCT_PACKED_END
+TCiA402PDO1600;
 
 
 /** \brief Data structure to handle the process data transmitted via 0x1601 (csp RxPDO)*/
@@ -522,9 +564,11 @@ TCiA402PDO1603;
 /** \brief Data structure to handle the axis specific object data*/
 typedef struct OBJ_STRUCT_PACKED_START
 {
+    TOBJ1600 sRxPDOMap0; /**< \brief csp/csv RxPDO (0x1600)*/
     TOBJ1601 sRxPDOMap1; /**< \brief csp RxPDO (0x1601)*/
     TOBJ1602 sRxPDOMap2; /**< \brief csv RxPDO (0x1602)*/
     TOBJ1603 sRxPDOMap3; /**< \brief cst RxPDO (0x1603)*/
+    TOBJ1A00 sTxPDOMap0; /**< \brief csp/csv TxPDO (0x1A00)*/
     TOBJ1A01 sTxPDOMap1; /**< \brief csp TxPDO (0x1A01)*/
     TOBJ1A02 sTxPDOMap2; /**< \brief csv TxPDO (0x1A02)*/
     TOBJ1A03 sTxPDOMap3; /**< \brief cst TxPDO (0x1A03)*/

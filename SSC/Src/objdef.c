@@ -892,6 +892,7 @@ UINT8 OBJ_Read( UINT16 index, UINT8 subindex, UINT32 objSize, OBJCONST TOBJECT O
     GDC_WR* v2 = &CPU2_CPU1;
     if ( index >= 0x2000 && index <= 0x3000)
     {
+        CountGdub++;
         if( v1->Flags.bits.UpPara == 2)
 //        if(count >= 500)
         {
@@ -905,6 +906,12 @@ UINT8 OBJ_Read( UINT16 index, UINT8 subindex, UINT32 objSize, OBJCONST TOBJECT O
         {
             return ABORTIDX_WORKING;
         }
+    }
+    else if(index == 0x6061)
+    {
+        pData[0]= v1->ModesOfOperationDisplay;
+        Count6061++;
+        return 0;
     }
     else
     {
@@ -1385,9 +1392,38 @@ UINT8 OBJ_Write( UINT16 index, UINT8 subindex, UINT32 dataSize, OBJCONST TOBJECT
     //将参数写入共享RAM中
     if((index >= 0x2000) & (index <= 0x3000))
     {
+        CountGdub++;
         v2->GDCIndex_Download = (((UINT32)index) - 0x2000)  + (((UINT32)subindex)<<16);
         v2->GDCIndexValue_Download = (UINT32)pData[0] + (((UINT32)pData[1])<<16);
         v2->Flags.all |= 0x0010;
+        return 0;
+    }
+    else if(index == 0x1C12)
+    {
+        Count1C12++;
+        if(Count1C12 <= 2)
+        {
+            sRxPDOassign.aEntries[0] = ((UINT16)pData[0]);
+        }
+//        if(Count1C12 == 2)
+//        {
+//            Count1C12 = 0;
+//        }
+        return 0;
+    }
+    else if(index == 0x1C13)
+    {
+        Count1C13++;
+        if(Count1C13 <= 2)
+        {
+            sTxPDOassign.aEntries[0] = ((UINT16)pData[0]);
+        }
+        return 0;
+    }
+    else if(index == 0x6060)
+    {
+        v2->ModesOfOperation = ((UINT16)pData[0]);
+        Count6060++;
         return 0;
     }
     else

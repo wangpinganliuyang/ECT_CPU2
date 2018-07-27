@@ -285,14 +285,25 @@ TSYNCMAN ESCMEM * GetSyncMan( UINT8 channel )
 	else if (channel == 2)
 	{
         SyncManInfo.PhysicalStartAddress = 0x1800;
-        SyncManInfo.Length = 0x006;
+        if(sRxPDOassign.aEntries[0] == 0x1600)
+        {
+            SyncManInfo.Length = 0x000D;
+        }
+        else
+        {
+            SyncManInfo.Length = 0x006;
+        }
         SyncManInfo.Settings[0] = ESC_readWordNonISR(0x0814);
         SyncManInfo.Settings[1] = 0x0001;
 	}
 	else if(channel == 3)
 	{
         SyncManInfo.PhysicalStartAddress = 0x1C00;
-        if(sTxPDOassign.aEntries[0] == 0x1A01)
+        if(sTxPDOassign.aEntries[0] == 0x1A00)
+        {
+            SyncManInfo.Length = 0x0013;
+        }
+        else if(sTxPDOassign.aEntries[0] == 0x1A01)
         {
             SyncManInfo.Length = 0x0006;
         }

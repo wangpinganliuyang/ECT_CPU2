@@ -88,7 +88,6 @@ V5.01 : Start file change log
 #define    MBXERR_INVALIDSIZE              0x08 /**< \brief Mailbox error "Invalid size"*/
 #define    MBXERR_SERVICEINWORK            0x09 /**< \brief Mailbox error "Service in work"*/
 
-
 /**
  * \brief Mailbox header
  */
